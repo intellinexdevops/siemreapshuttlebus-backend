@@ -9,11 +9,15 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { useAuthActions } from "@convex-dev/auth/react"
+import { useState } from "react"
 
 export function LoginForm({
     className,
     ...props
 }: React.ComponentProps<"div">) {
+    const { signIn } = useAuthActions();
+    const [step, setStep] = useState<"signUp" | "signIn">("signIn");
     return (
         <div className={cn("flex flex-col gap-6 w-full max-w-96", className)} {...props}>
             <Card>
@@ -24,7 +28,11 @@ export function LoginForm({
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <form>
+                    <form onSubmit={(event) => {
+                        event.preventDefault();
+                        const formData = new FormData(event.currentTarget);
+                        void signIn("password", formData);
+                    }}>
                         <div className="flex flex-col gap-6">
                             <div className="grid gap-3">
                                 <Label htmlFor="email">Email</Label>
@@ -33,6 +41,7 @@ export function LoginForm({
                                     type="email"
                                     placeholder="m@example.com"
                                     required
+                                    name="email"
                                 />
                             </div>
                             <div className="grid gap-3">
@@ -45,15 +54,20 @@ export function LoginForm({
                                         Forgot your password?
                                     </a> */}
                                 </div>
-                                <Input id="password" type="password" required />
+                                <Input id="password" name="password" type="password" required />
                             </div>
+                            <Input name="flow" type="hidden" value={step} />
                             <div className="flex flex-col gap-3">
                                 <Button type="submit" className="w-full">
-                                    Login
+                                    {step === "signIn" ? "Sign in" : "Sign up"}
                                 </Button>
-                                {/* <Button variant="outline" className="w-full">
-                                    Login with Google
-                                </Button> */}
+                                <Button variant="outline" className="w-full" type="button"
+                                    onClick={() => {
+                                        setStep(step === "signIn" ? "signUp" : "signIn");
+                                    }}
+                                >
+                                    {step === "signIn" ? "Sign up instead" : "Sign in instead"}
+                                </Button>
                             </div>
                         </div>
                         <div className="mt-4 text-center text-sm">

@@ -1,8 +1,17 @@
-import { Outlet } from "react-router"
+import { Authenticated, Unauthenticated } from "convex/react"
+import { Navigate, Outlet } from "react-router"
 
 
 const RootLayout = () => {
-    return <Outlet />
+    return (<>
+        <Unauthenticated>
+            <Outlet />
+        </Unauthenticated>
+        <Authenticated>
+            <Navigate to="/dashboard" />
+        </Authenticated>
+    </>
+    )
 }
 
 export default RootLayout
