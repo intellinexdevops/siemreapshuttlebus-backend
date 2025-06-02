@@ -4,13 +4,6 @@ import { v } from "convex/values";
 
 const schema = defineSchema({
   ...authTables,
-  transportations: defineTable({
-    price: v.float64(),
-    status: v.float64(),
-    storageId: v.string(),
-    title: v.string(),
-    unit: v.string(),
-  }),
   transactions: defineTable({
     departure_date: v.string(),
     email: v.string(),
@@ -28,6 +21,32 @@ const schema = defineSchema({
     to: v.string(),
     total: v.float64(),
     trip: v.string(),
+  }),
+  airplane_time: defineTable({
+    from_town: v.boolean(),
+    time: v.string(),
+  }),
+  payments: defineTable({
+    status: v.boolean(),
+    title: v.string(),
+    value: v.string(),
+  }),
+  support: defineTable({
+    status: v.boolean(),
+    storageId: v.id("_storage"),
+    title: v.string(),
+    value: v.string(),
+  }),
+  tasks: defineTable({
+    isCompleted: v.boolean(),
+    text: v.string(),
+  }),
+  transportations: defineTable({
+    price: v.float64(),
+    status: v.float64(),
+    storageId: v.string(),
+    title: v.string(),
+    unit: v.string(),
   }),
 });
 

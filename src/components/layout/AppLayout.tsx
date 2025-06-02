@@ -11,7 +11,7 @@ const AppLayout = () => {
         <>
             <Authenticated>
                 <SidebarProvider>
-                    <AppSidebar />
+                    <AppSidebar variant="inset" />
                     <SidebarInset>
                         <header className="flex h-16 shrink-0 items-center gap-2">
                             <div className="flex items-center gap-2 px-4">
@@ -38,7 +38,7 @@ const AppLayout = () => {
                             </div>
                         </header>
                         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-                            <div className="min-h-[100vh] flex-1 md:min-h-min">
+                            <div className="min-h-[100vh] md:min-h-min">
                                 <Outlet />
                             </div>
                         </div>
