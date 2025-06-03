@@ -50,7 +50,7 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
     {
         accessorKey: "url",
         header: "Photo",
-        cell: ({ row }) => <div className="h-[70px]">
+        cell: ({ row }) => <div className="h-[70px] w-[100px]">
             <img src={row.original.url} className="w-full h-full object-cover rounded-md" alt={row.original.title} />
         </div>
     },
@@ -68,33 +68,6 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
         accessorKey: "capacity",
         header: "Capacity",
         cell: ({ row }) => <div>{row.original.capacity}</div>
-    },
-    {
-        accessorKey: "include",
-        header: "Include",
-        cell: ({ row }) => <div>
-            <ul>
-                {row.original.include?.map((item, index) => (
-                    <div key={index}>
-                        <p>- {item}</p>
-                    </div>
-                ))}
-            </ul>
-        </div>,
-        enableHiding: true,
-    },
-    {
-        accessorKey: "exclude",
-        header: "Exclude",
-        cell: ({ row }) => <div>
-            <ul>
-                {row.original.exclude?.map((item, index) => (
-                    <div key={index}>
-                        <p>- {item}</p>
-                    </div>
-                ))}
-            </ul>
-        </div>
     },
     {
         accessorKey: "_creationTime",
