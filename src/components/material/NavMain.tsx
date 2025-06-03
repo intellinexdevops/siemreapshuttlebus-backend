@@ -16,7 +16,7 @@ import {
     // SidebarMenuSubButton,
     // SidebarMenuSubItem,
 } from "@/components/ui/sidebar"
-import { Link } from "react-router"
+import { Link, useLocation } from "react-router"
 
 export function NavMain({
     items,
@@ -32,20 +32,28 @@ export function NavMain({
         }[]
     }[]
 }) {
+
+    const { pathname } = useLocation();
+    const path = pathname.split('/');
+
     return (
         <SidebarGroup>
             <SidebarGroupLabel>Overview</SidebarGroupLabel>
             <SidebarMenu>
-                {items.map((item) => (
-                    <Collapsible key={item.title} asChild defaultOpen={item.isActive}>
-                        <SidebarMenuItem>
-                            <SidebarMenuButton asChild tooltip={item.title}>
-                                <Link to={item.url}>
-                                    <item.icon />
-                                    <span>{item.title}</span>
-                                </Link>
-                            </SidebarMenuButton>
-                            {/*item.items?.length ? (
+
+                {items.map((item) => {
+                    const isActive = path[path.length - 1] === item.url;
+                    console.log(item.url)
+                    return (
+                        <Collapsible key={item.title} asChild defaultOpen={item.isActive}>
+                            <SidebarMenuItem>
+                                <SidebarMenuButton asChild tooltip={item.title} className={isActive ? 'hover:bg-neutral-900' : ''}>
+                                    <Link to={item.url === 'dashboard' ? `/${item.url}` : item.url} className={`${isActive ? 'bg-neutral-800' : ''}`} >
+                                        <item.icon className={isActive ? 'text-neutral-50' : 'text-neutral-500'} />
+                                        <span className={isActive ? 'text-neutral-50' : 'text-neutral-500'} >{item.title}</span>
+                                    </Link>
+                                </SidebarMenuButton>
+                                {/*item.items?.length ? (
                                 <>
                                     <CollapsibleTrigger asChild>
                                         <SidebarMenuAction className="data-[state=open]:rotate-90">
@@ -68,9 +76,10 @@ export function NavMain({
                                     </CollapsibleContent>
                                 </>
                             ) : null*/}
-                        </SidebarMenuItem>
-                    </Collapsible>
-                ))}
+                            </SidebarMenuItem>
+                        </Collapsible>
+                    )
+                })}
             </SidebarMenu>
         </SidebarGroup>
     )

@@ -47,6 +47,9 @@ const schema = defineSchema({
     storageId: v.string(),
     title: v.string(),
     unit: v.string(),
+    include: v.optional(v.array(v.string())),
+    exclude: v.optional(v.array(v.string())),
+    capacity: v.optional(v.string()),
   }),
 });
 

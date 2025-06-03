@@ -6,17 +6,13 @@ import {
     CreditCard,
     LayoutDashboard,
     LifeBuoy,
-    // Map,
     Notebook,
-    // PieChart,
     Send,
     TicketIcon,
-    // Settings2,
     UserCircle,
 } from "lucide-react"
 
 import { NavMain } from "@/components/material/NavMain"
-// import { NavSecondary } from "@/components/nav-secondary"
 import { NavUser } from "@/components/material/NavUser"
 import {
     Sidebar,
@@ -39,7 +35,7 @@ const data = {
     navMain: [
         {
             title: "Dashboard",
-            url: "/sr-shuttlebus",
+            url: "dashboard",
             icon: LayoutDashboard,
             isActive: true
         },
@@ -53,29 +49,6 @@ const data = {
             url: "user",
             icon: UserCircle,
         },
-        // {
-        //     title: "Settings",
-        //     url: "#",
-        //     icon: Settings2,
-        //     items: [
-        //         {
-        //             title: "General",
-        //             url: "#",
-        //         },
-        //         {
-        //             title: "Team",
-        //             url: "#",
-        //         },
-        //         {
-        //             title: "Billing",
-        //             url: "#",
-        //         },
-        //         {
-        //             title: "Limits",
-        //             url: "#",
-        //         },
-        //     ],
-        // },
     ],
     navSecondary: [
         {
@@ -144,7 +117,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <SidebarContent>
                 <NavMain items={data.navMain} />
                 <NavContent projects={data.content} />
-                {/* <NavSecondary items={data.navSecondary} className="mt-auto" /> */}
             </SidebarContent>
             <SidebarFooter>
                 <NavUser user={data.user} />

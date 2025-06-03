@@ -1,102 +1,46 @@
-import * as React from "react"
-import {
-    closestCenter,
-    DndContext,
-    KeyboardSensor,
-    MouseSensor,
-    TouchSensor,
-    useSensor,
-    useSensors,
-    type DragEndEvent,
-    type UniqueIdentifier,
-} from "@dnd-kit/core"
-import { restrictToVerticalAxis } from "@dnd-kit/modifiers"
-import {
-    arrayMove,
-    SortableContext,
-    verticalListSortingStrategy,
-} from "@dnd-kit/sortable"
-import {
-    IconChevronDown,
-    IconLayoutColumns,
-} from "@tabler/icons-react"
-import {
-    type ColumnFiltersState,
-    flexRender,
-    getCoreRowModel,
-    getFacetedRowModel,
-    getFacetedUniqueValues,
-    getFilteredRowModel,
-    getPaginationRowModel,
-    getSortedRowModel,
-    type SortingState,
-    useReactTable,
-    type VisibilityState,
-} from "@tanstack/react-table"
-// import { toast } from "sonner"
-import { z } from "zod"
-import { Button } from "@/components/ui/button"
-
-import {
-    DropdownMenu,
-    DropdownMenuCheckboxItem,
-    DropdownMenuContent,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Label } from "@/components/ui/label"
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table"
-import {
-    Tabs,
-    TabsContent,
-} from "@/components/ui/tabs"
-import DraggableRow from "../DraggableRow"
-import TableFooter from "../TableFooter"
-import columns from "./TableColumns"
+import { closestCenter, DndContext, KeyboardSensor, MouseSensor, TouchSensor, useSensor, useSensors, type DragEndEvent, type UniqueIdentifier } from "@dnd-kit/core";
+import { flexRender, getCoreRowModel, getFacetedRowModel, getFacetedUniqueValues, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, useReactTable, type ColumnFiltersState, type SortingState, type VisibilityState } from "@tanstack/react-table";
+import React from "react";
+import { useState } from "react";
+import { z } from "zod";
+import columns from "./TableColumns";
+import { arrayMove, SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
+import { Label } from "@/components/ui/label";
+import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { IconChevronDown, IconLayoutColumns } from "@tabler/icons-react";
+import { Button } from "@/components/ui/button";
+import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import DraggableRow from "../DraggableRow";
+import TableFooter from "../TableFooter";
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const schema = z.object({
     _id: z.string(),
-    departure_date: z.string(),
-    email: z.string(),
-    name: z.string(),
-    from: z.string(),
-    to: z.string(),
-    issued_date: z.string(),
-    order_ref: z.string(),
-    passager: z.number(),
-    payment_method: z.string(),
-    phone: z.string(),
-    status: z.boolean(),
-    return_date: z.string(),
-    ticket_type: z.string(),
-    total: z.number(),
-    trip: z.string(),
-    special_request: z.string(),
-    _creationTime: z.number()
-})
+    _creationTime: z.number(),
+    price: z.number(),
+    status: z.number(),
+    title: z.string(),
+    unit: z.string(),
+    capacity: z.optional(z.string()),
+    exclude: z.optional(z.array(z.string())),
+    include: z.optional(z.array(z.string())),
+    url: z.optional(z.string()),
+    storageId: z.string()
+});
 
-
-export function DataTable({
-    data: initialData,
+export default function DataTable({
+    data: initialData
 }: {
     data: z.infer<typeof schema>[]
 }) {
-    const [data, setData] = React.useState(() => initialData)
-    const [rowSelection, setRowSelection] = React.useState({})
-    const [columnVisibility, setColumnVisibility] =
-        React.useState<VisibilityState>({})
-    const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-        []
-    )
-    const [sorting, setSorting] = React.useState<SortingState>([])
-    const [pagination, setPagination] = React.useState({
+    const [data, setData] = useState(() => initialData);
+    const [rowSelection, setRowSelection] = useState({});
+    const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+    const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+    const [sorting, setSorting] = useState<SortingState>([])
+    const [pagination, setPagination] = useState({
         pageIndex: 0,
         pageSize: 8,
     })
@@ -148,6 +92,7 @@ export function DataTable({
         }
     }
 
+
     return (
         <Tabs
             defaultValue="outline"
@@ -155,7 +100,7 @@ export function DataTable({
         >
             <div className="flex items-center justify-between">
                 <Label htmlFor="view-selector" className="text-xl">
-                    Recent Booking
+                    Transportation List
                 </Label>
 
                 <div className="flex items-center gap-2">
