@@ -7,12 +7,32 @@ import { Input } from "@/components/ui/input";
 import React, { type ChangeEvent } from "react";
 import { Switch } from "@/components/ui/switch";
 import { EarthIcon, LockIcon, PlusIcon, Trash2 } from "lucide-react";
+import { useMutation } from "convex/react";
+import { api } from "../../../../convex/_generated/api";
+import type { Id } from "../../../../convex/_generated/dataModel";
+import { toast } from "sonner"
 
 export default function TableCellViewer({ item, header = item.title }: { item: z.infer<typeof schema>; header?: string; }) {
+
+    const [previewUrl, setPreviewUrl] = React.useState<string | null>(null);
+    const imageInput = React.useRef<HTMLInputElement>(null);
+    const [selectedImage, setSelectedImage] = React.useState<File | null>(null);
+    const generateUploadUrl = useMutation(api.transportation.generateUploadUrl);
+
+    const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files![0]
+        setSelectedImage(file);
+        setPreviewUrl(URL.createObjectURL(file))
+    }
 
     const [amount, setAmount] = React.useState<string>(() => String(item.price));
     const handleChangeAmount = (e: ChangeEvent<HTMLInputElement>) => {
         setAmount(e.target.value);
+    }
+
+    const [name, setName] = React.useState<string>(() => String(item.title));
+    const handleChangeTitle = (e: ChangeEvent<HTMLInputElement>) => {
+        setName(e.target.value);
     }
 
     const [capacity, setCapacity] = React.useState<string>(() => item.capacity ?? '');
@@ -52,6 +72,69 @@ export default function TableCellViewer({ item, header = item.title }: { item: z
         setExclude(prev => prev.map((item, i) => i === index ? value : item))
     }
 
+    const updateTransportation = useMutation(api.transportation.updateTransportation);
+
+    const handleUpdateTransportation = async (id: string) => {
+        if (selectedImage) {
+            const postUrl = await generateUploadUrl();
+            const result = await fetch(postUrl, {
+                method: "POST",
+                headers: { "Content-Type": selectedImage!.type },
+                body: selectedImage,
+            });
+            const { storageId } = await result.json();
+            const transId = id as Id<'transportations'>
+            const res = await updateTransportation({
+                id: transId,
+                price: parseFloat(amount),
+                capacity: capacity,
+                exclude: exlucde,
+                include: include,
+                status: status,
+                title: name,
+                storageId: storageId
+            });
+            if (!res) {
+                toast.success(`Successfully updated.`)
+            } else {
+                toast.error(`Error while updating transportation.`)
+            }
+        } else {
+            const transId = id as Id<'transportations'>
+            const res = await updateTransportation({
+                id: transId,
+                price: parseFloat(amount),
+                capacity: capacity,
+                exclude: exlucde,
+                include: include,
+                status: status,
+                title: name,
+                storageId: item.storageId
+            });
+            if (!res) {
+                toast.success(`Successfully updated.`)
+            } else {
+                toast.error(`Error while updating transportation.`)
+            }
+        }
+    }
+
+    const deleteTransportation = useMutation(api.transportation.deleteTransportation)
+    const handleOnDelete = async (id: string) => {
+        try {
+            const transId = id as Id<'transportations'>;
+            const result = await deleteTransportation({ id: transId });
+            if (!result) {
+                toast.success('Successfully delete.')
+            } else {
+                toast.error(`Error while deleting a transportation.`);
+            }
+        } catch (error) {
+            console.log(error)
+        }
+
+    }
+
     return (
         <Drawer direction={"right"}>
             <DrawerTrigger asChild>
@@ -70,17 +153,27 @@ export default function TableCellViewer({ item, header = item.title }: { item: z
                     <div className="flex flex-col gap-4">
                         <div className="flex space-x-4">
                             <div className="w-30 h-24">
-                                <img src={item.url} className="w-full h-full rounded-md object-cover" alt="" />
+                                {previewUrl ? <img src={previewUrl} className="w-full h-full rounded-md object-cover" alt="" />
+                                    :
+                                    <img src={item.url} className="w-full h-full rounded-md object-cover" alt="" />
+                                }
                             </div>
                             <div className="mt-2 flex flex-col space-y-2">
-                                <Button size="sm" variant='outline'>Upload Photo</Button>
+                                <input type="file" name="" id="" ref={imageInput} hidden onChange={handleImageChange} />
+                                <Button size="sm" variant='outline' onClick={() => imageInput.current?.click()}>Upload Photo</Button>
                             </div>
                         </div>
                         <div className="flex flex-col gap-y-4">
-                            <Label htmlFor="header">Amount</Label>
-                            <div className="relative">
-                                <Input min={0} required type="number" id="header" onChange={handleChangeAmount} value={amount} defaultValue={amount} />
-                                <span className="absolute right-4 -translate-y-1/2 top-1/2 text-neutral-500">USD</span>
+                            <div className="flex flex-col gap-3">
+                                <Label htmlFor="type">Name</Label>
+                                <Input value={name} onChange={handleChangeTitle} />
+                            </div>
+                            <div className="flex flex-col gap-3">
+                                <Label htmlFor="header">Price</Label>
+                                <div className="relative">
+                                    <Input min={0} required type="number" id="header" onChange={handleChangeAmount} value={amount} defaultValue={amount} />
+                                    <span className="absolute right-4 -translate-y-1/2 top-1/2 text-neutral-500">USD</span>
+                                </div>
                             </div>
                             <div className="flex flex-col gap-3">
                                 <Label htmlFor="type">Capacity</Label>
@@ -137,9 +230,12 @@ export default function TableCellViewer({ item, header = item.title }: { item: z
                     </div>
                 </div>
                 <DrawerFooter>
-                    <Button>Submit</Button>
+                    <Button onClick={() => handleUpdateTransportation(item._id)}>Save Change</Button>
                     <DrawerClose asChild>
-                        <Button variant="outline">Done</Button>
+                        <Button onClick={() => handleOnDelete(item._id)} variant="outline">
+                            <Trash2 className="text-red-400" />
+                            Delete
+                        </Button>
                     </DrawerClose>
                 </DrawerFooter>
             </DrawerContent>

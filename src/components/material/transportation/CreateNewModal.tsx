@@ -1,4 +1,3 @@
-'use client'
 
 import { Button } from "@/components/ui/button"
 import {
@@ -13,12 +12,28 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import supabase from "@/utils/supabase"
+// import supabase from "@/utils/supabase"
 import { IconPhotoPlus } from "@tabler/icons-react"
+import { api } from "../../../../convex/_generated/api"
+import { useMutation } from "convex/react"
 import { PlusIcon, Trash2 } from 'lucide-react'
 import React, { type ChangeEvent } from "react"
 
 function CreateNewModal() {
+
+    const [title, setTitle] = React.useState<string>('')
+    const handleChangeTitle = (e: ChangeEvent<HTMLInputElement>) => {
+        setTitle(e.target.value);
+    }
+
+    const [capacity, setCapacity] = React.useState<string>('')
+    const handleChangeCapacity = (e: ChangeEvent<HTMLInputElement>) => {
+        setCapacity(e.target.value);
+    }
+    const [price, setPrice] = React.useState<string>('')
+    const handleChangePrice = (e: ChangeEvent<HTMLInputElement>) => {
+        setPrice(e.target.value);
+    }
 
     const [include, setInclude] = React.useState<string[]>(() => ['']);
     const addIncludeItem = () => {
@@ -47,34 +62,58 @@ function CreateNewModal() {
         setExclude(prev => prev.map((item, i) => i === index ? value : item))
     }
 
+    const [previewUrl, setPreviewUrl] = React.useState<string | null>(null);
     const imageInputRef = React.useRef<HTMLInputElement>(null);
+    const generateUploadUrl = useMutation(api.transportation.generateUploadUrl);
+    const createTransportation = useMutation(api.transportation.createTransportation);
     const [imageFile, setImageFile] = React.useState<File | undefined>();
-    const [imageUrl, setImageUrl] = React.useState<string | undefined>();
     const handleOnSelectImageChage = async (e: ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
             const file = e.target.files[0]
-            console.log(file);
-            const { data, error } = await supabase.storage
-                .from('siemreapshuttlebus')
-                .upload(`public/${file.name}`, file);
-            console.error(error);
+            // console.log(file);
+            // const { data, error } = await supabase.storage
+            //     .from('siemreapshuttlebus')
+            //     .upload(`public/${file.name}`, file);
+            // console.error(error);
             setImageFile(file);
-            setImageUrl(data?.fullPath);
+            setPreviewUrl(URL.createObjectURL(file));
+            // setImageUrl(data?.fullPath);
         }
     }
 
     const handleCancel = async () => {
-        if (imageFile) {
-            const { data, error } = await supabase.storage.from('siemreapshuttlebus').remove([`public/${imageFile.name}`]);
-            console.log({ data, error })
-            setImageUrl(undefined)
-            setImageFile(undefined)
-        }
+        // if (imageFile) {
+        //     const { data, error } = await supabase.storage.from('siemreapshuttlebus').remove([`public/${imageFile.name}`]);
+        //     console.log({ data, error })
+        //     setImageUrl(undefined)
+        //     setImageFile(undefined)
+        // }
+    }
+
+    const handleCreate = async () => {
+        const postUrl = await generateUploadUrl();
+        const result = await fetch(postUrl, {
+            method: "POST",
+            headers: { "Content-Type": imageFile!.type },
+            body: imageFile,
+        });
+        const { storageId } = await result.json();
+
+        await createTransportation({
+            title,
+            capacity,
+            price: parseFloat(price),
+            status: 1,
+            storageId,
+            exclude: exlucde,
+            include: include
+        });
+
     }
 
     return (
         <Dialog onOpenChange={handleCancel}>
-            <form>
+            <div>
                 <DialogTrigger asChild>
                     <Button>
                         <PlusIcon />
@@ -92,20 +131,20 @@ function CreateNewModal() {
                     <div className="grid grid-cols-2 gap-x-5 gap-y-8">
                         <div className="grid gap-3">
                             <Label htmlFor="name-1">Title<span className='text-red-500'>*</span></Label>
-                            <Input id="name-1" name="title" placeholder='Enter title' />
+                            <Input value={title} onChange={handleChangeTitle} id="name-1" name="title" placeholder='Enter title' />
                         </div>
-                        <div className="grid gap-3">
+                        {/* <div className="grid gap-3">
                             <Label htmlFor="username-1">Description</Label>
                             <Input id="username-1" name="description" placeholder='Enter description' />
-                        </div>
+                        </div> */}
 
                         <div className="grid gap-3">
                             <Label htmlFor="username-1">Capacity<span className='text-red-500'>*</span></Label>
-                            <Input id="username-1" name="capacity" placeholder='E.g. 2-6 Pax' />
+                            <Input id="username-1" value={capacity} onChange={handleChangeCapacity} name="capacity" placeholder='E.g. 2-6 Pax' />
                         </div>
                         <div className="grid gap-3">
                             <Label htmlFor="username-1">Price ($)<span className='text-red-500'>*</span></Label>
-                            <Input id="username-1" name="capacity" placeholder='USD 0.00' />
+                            <Input value={price} onChange={handleChangePrice} id="username-1" name="price" placeholder='USD 0.00' />
                         </div>
 
                         <div className="col-span-2 border-t pt-4 border-neutral-100">
@@ -147,9 +186,9 @@ function CreateNewModal() {
                             </div>
                         </div>
                         <div className="">
-                            {imageUrl && (
+                            {previewUrl && (
                                 <div className="mb-2 rounded-md overflow-hidden w-[120px] h-[100px]">
-                                    <img src={`${import.meta.env.VITE_IMAGE_URL}/${imageUrl}`} width={512} height={512} className="w-full h-full object-cover" loading="lazy" alt={imageFile?.name} />
+                                    <img src={previewUrl} width={512} height={512} className="w-full h-full object-cover" loading="lazy" alt={imageFile?.name} />
                                 </div>
                             )}
                             <input type="file" onChange={handleOnSelectImageChage} ref={imageInputRef} hidden />
@@ -166,10 +205,10 @@ function CreateNewModal() {
                         <DialogClose asChild>
                             <Button variant="outline" onClick={handleCancel}>Cancel</Button>
                         </DialogClose>
-                        <Button type="submit">Save changes</Button>
+                        <Button type="button" onClick={handleCreate}>Save changes</Button>
                     </DialogFooter>
                 </DialogContent>
-            </form>
+            </div>
         </Dialog>
     )
 }

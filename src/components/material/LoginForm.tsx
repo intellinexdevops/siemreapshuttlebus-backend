@@ -9,15 +9,18 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { useState } from "react"
+import { useAuth } from "@/middleware/AuthMiddleware"
 
 export function LoginForm({
     className,
     ...props
 }: React.ComponentProps<"div">) {
-    const [step, setStep] = useState<"signUp" | "signIn">("signIn");
-    const signIn = (input: FormData) => {
-        console.log(input)
+    const { login } = useAuth()
+    const signIn = async (input: FormData) => {
+        const email = input.get('email') as string;
+        const password = input.get('password') as string;
+
+        await login(email, password)
     }
     return (
         <div className={cn("flex flex-col gap-6 w-full max-w-96", className)} {...props}>
@@ -57,17 +60,9 @@ export function LoginForm({
                                 </div>
                                 <Input id="password" name="password" type="password" required />
                             </div>
-                            <Input name="flow" type="hidden" value={step} />
                             <div className="flex flex-col gap-3">
                                 <Button type="submit" className="w-full">
-                                    {step === "signIn" ? "Sign in" : "Sign up"}
-                                </Button>
-                                <Button variant="outline" className="w-full" type="button"
-                                    onClick={() => {
-                                        setStep(step === "signIn" ? "signUp" : "signIn");
-                                    }}
-                                >
-                                    {step === "signIn" ? "Sign up instead" : "Sign in instead"}
+                                    Sign in
                                 </Button>
                             </div>
                         </div>

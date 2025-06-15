@@ -4,8 +4,10 @@ import {
     Clock3Icon,
     Command,
     CreditCard,
+    Disc3Icon,
     LayoutDashboard,
     LifeBuoy,
+    // LockIcon,
     Notebook,
     Send,
     TicketIcon,
@@ -27,11 +29,6 @@ import { NavContent } from "./NavContent"
 import { Link } from "react-router"
 
 const data = {
-    user: {
-        name: "shadcn",
-        email: "m@example.com",
-        avatar: "/avatars/shadcn.jpg",
-    },
     navMain: [
         {
             title: "Dashboard",
@@ -87,6 +84,16 @@ const data = {
             name: "Support",
             url: "support",
             icon: LifeBuoy
+        },
+        // {
+        //     name: 'MFA-Auth',
+        //     url: 'multi-factor-auth',
+        //     icon: LockIcon
+        // }
+        {
+            name: 'Storage',
+            url: 'storage-management',
+            icon: Disc3Icon
         }
     ],
     pages: [
@@ -119,7 +126,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 <NavContent projects={data.content} />
             </SidebarContent>
             <SidebarFooter>
-                <NavUser user={data.user} />
+                <NavUser />
             </SidebarFooter>
         </Sidebar>
     )
