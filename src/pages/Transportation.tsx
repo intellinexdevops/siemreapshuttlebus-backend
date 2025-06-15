@@ -1,9 +1,9 @@
-import { Button } from "@/components/ui/button"
 import { api } from "../../convex/_generated/api"
 import { useQuery } from "convex/react"
-import { BusIcon, PlusIcon } from "lucide-react"
+import { BusIcon } from "lucide-react"
 import DataTable, { schema } from "@/components/material/transportation/DataTable"
 import type { z } from "zod"
+import CreateNewModal from "@/components/material/transportation/CreateNewModal"
 
 
 const Transportation = () => {
@@ -25,10 +25,7 @@ const Transportation = () => {
                     <p className="text-sm text-neutral-400">Manage Your Transportation Service</p>
                 </div>
                 <div>
-                    <Button>
-                        <PlusIcon />
-                        <span>New Transport.</span>
-                    </Button>
+                    <CreateNewModal />
                 </div>
             </div>
             <div className="mt-6">

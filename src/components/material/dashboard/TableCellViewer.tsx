@@ -73,10 +73,12 @@ export default function TableCellViewer({ item, header = item.name }: { item: z.
                                     <Label className="text-sm text-neutral-500 font-light" htmlFor="name">Direction</Label>
                                     <p className="text-sm font-medium text-neutral-700 flex items-center gap-x-2">{item.from} <MoveRight size={14} /> {item.to}</p>
                                 </div>
-                                <div className="flex flex-col gap-1">
-                                    <Label className="text-sm text-neutral-500 font-light" htmlFor="name">Direction</Label>
-                                    <p className="text-sm font-medium text-neutral-700 flex items-center gap-x-2">{item.from} <MoveRight size={14} /> {item.to}</p>
-                                </div>
+                                {item.trip === "Round trip" && (
+                                    <div className="flex flex-col gap-1">
+                                        <Label className="text-sm text-neutral-500 font-light" htmlFor="name">Return Date</Label>
+                                        <p className="text-sm font-medium text-neutral-700 flex items-center gap-x-2">{item.return_date !== "" ? item.return_date : "-"}</p>
+                                    </div>
+                                )}
                             </div>
                         </div>
 

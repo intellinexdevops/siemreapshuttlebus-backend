@@ -4,14 +4,22 @@ import { Label } from "@/components/ui/label"
 import { AlertCircleIcon } from "lucide-react"
 import { useNavigate } from "react-router"
 
+import { useAuth } from "@/middleware/AuthMiddleware"
+
 const Root = () => {
 
     const navigate = useNavigate();
 
+    const { session } = useAuth()
+
+    const handleNavigate = () => {
+        navigate(session ? '/dashboard' : '/login');
+    }
+
     return (
         <div className="flex flex-col gap-y-6 items-center justify-center h-screen">
             <Label className="text-2xl">Thank you for using our services!</Label>
-            <Button onClick={() => navigate("/login")}>Continue to Dashboard</Button>
+            <Button onClick={handleNavigate}>Continue to Dashboard</Button>
             <div>
                 <Alert variant="destructive">
                     <AlertCircleIcon />

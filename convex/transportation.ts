@@ -34,3 +34,64 @@ export const select = query({
     };
   },
 });
+
+export const createTransportation = mutation({
+  args: {
+    title: v.string(),
+    price: v.number(),
+    status: v.number(),
+    storageId: v.string(),
+    capacity: v.string(),
+    include: v.optional(v.array(v.string())),
+    exclude: v.optional(v.array(v.string())),
+  },
+  handler: async (ctx, args) => {
+    const { title, price, status, storageId, capacity, include, exclude } =
+      args;
+
+    return await ctx.db.insert("transportations", {
+      title,
+      price,
+      status,
+      storageId,
+      unit: "day",
+      capacity,
+      exclude,
+      include,
+    });
+  },
+});
+
+export const updateTransportation = mutation({
+  args: {
+    id: v.id("transportations"),
+    title: v.optional(v.string()),
+    capacity: v.optional(v.string()),
+    price: v.optional(v.number()),
+    include: v.optional(v.array(v.string())),
+    exclude: v.optional(v.array(v.string())),
+    status: v.optional(v.number()),
+    storageId: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const { id, title, capacity, price, include, status, exclude, storageId } =
+      args;
+    return await ctx.db.patch(id, {
+      title: title,
+      capacity: capacity,
+      price: price,
+      include: include,
+      exclude: exclude,
+      status: status,
+      storageId: storageId,
+    });
+  },
+});
+
+export const deleteTransportation = mutation({
+  args: { id: v.id("transportations") },
+  handler: async (ctx, args) => {
+    const { id } = args;
+    return await ctx.db.delete(id);
+  },
+});
